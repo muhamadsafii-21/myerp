@@ -1,0 +1,62 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: myerp-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - myerp-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  backend:
+    build:
+      context: ./MyERP.api
+      dockerfile: Dockerfile
+    container_name: myerp-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=${DB_NAME};User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;Encrypt=False"
+      Jwt__Key: ${JWT_KEY}
+      Jwt__Issuer: MyERP
+      Jwt__Audience: MyERPUsers
+    ports:
+      - "${BACKEND_PORT}:5000"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - myerp-network
+    volumes:
+      - ./MyERP.api/wwwroot:/app/wwwroot
+
+  frontend:
+    build:
+      context: ./myerp-frontend
+      dockerfile: Dockerfile
+    container_name: myerp-frontend
+    ports:
+      - "${FRONTEND_PORT}:80"
+    depends_on:
+      - backend
+    networks:
+      - myerp-network
+
+volumes:
+  sqlserver-data:
+    driver: local
+
+networks:
+  myerp-network:
+    driver: bridge

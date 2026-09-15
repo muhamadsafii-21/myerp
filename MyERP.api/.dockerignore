@@ -1,0 +1,14 @@
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.log
+appsettings.Development.json
+Login.json
+.git/
+.gitignore
+Dockerfile
+.dockerignore
+README.md
