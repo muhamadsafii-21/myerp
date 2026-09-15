@@ -65,6 +65,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+// ===== ENDPOINT SEMENTARA UNTUK MIGRATION =====
+app.MapGet("/migrate-now", async (AppDbContext db) =>
+{
+    try
+    {
+        await db.Database.MigrateAsync();
+        return Results.Ok(new { message = "Migration berhasil!" });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
+// ===== END OF ENDPOINT SEMENTARA =====
 
 if (app.Environment.IsDevelopment())
 {
