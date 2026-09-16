@@ -6,7 +6,7 @@ using MyERP.Api.Data;
 using MyERP.Api.Helpers;
 using MyERP.Api.Services;
 using MyERP.Api.Services.Interfaces;
-AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.EnableTls12", true);
+
 AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseSystemDefaultSecureProtocols", true);
 
 var builder = WebApplication.CreateBuilder(args);
@@ -81,6 +81,28 @@ app.MapGet("/migrate-now", async (AppDbContext db) =>
     }
 });
 // ===== END OF ENDPOINT SEMENTARA =====
+app.MapGet("/check-tables", async (AppDbContext db) =>
+{
+    try
+    {
+        var tables = new List<string>();
+        var conn = db.Database.GetDbConnection();
+        await conn.OpenAsync();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT name FROM sys.tables ORDER BY name";
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            tables.Add(reader.GetString(0));
+        }
+        await conn.CloseAsync();
+        return Results.Ok(new { count = tables.Count, tables });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
 
 if (app.Environment.IsDevelopment())
 {
