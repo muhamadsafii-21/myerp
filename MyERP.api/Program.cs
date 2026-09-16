@@ -6,6 +6,8 @@ using MyERP.Api.Data;
 using MyERP.Api.Helpers;
 using MyERP.Api.Services;
 using MyERP.Api.Services.Interfaces;
+AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.EnableTls12", true);
+AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseSystemDefaultSecureProtocols", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
