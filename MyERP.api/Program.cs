@@ -98,7 +98,7 @@ app.MapGet("/check-tables", async (AppDbContext db) =>
         var conn = db.Database.GetDbConnection();
         await conn.OpenAsync();
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = "SELECT name FROM sys.tables ORDER BY name";
+        cmd.CommandText = "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename";
         using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
