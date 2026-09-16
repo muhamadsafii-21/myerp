@@ -112,6 +112,47 @@ app.MapGet("/check-tables", async (AppDbContext db) =>
         return Results.BadRequest(new { error = ex.Message });
     }
 });
+app.MapGet("/seed-now", async (AppDbContext db) =>
+{
+    try
+    {
+        if (!await db.Users.AnyAsync())
+        {
+            var user = new MyERP.Api.Models.Auth.User
+            {
+                Username = "testuser",
+                Email = "test@myerp.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                FullName = "Test User",
+                Role = "Staff",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            db.Users.Add(user);
+        }
+
+        if (!await db.Warehouses.AnyAsync())
+        {
+            var warehouse = new MyERP.Api.Models.Inventory.Warehouse
+            {
+                Name = "Gudang Utama",
+                Location = "Jakarta",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            db.Warehouses.Add(warehouse);
+        }
+
+        await db.SaveChangesAsync();
+        return Results.Ok(new { message = "Seed berhasil!" });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
 
 if (app.Environment.IsDevelopment())
 {
