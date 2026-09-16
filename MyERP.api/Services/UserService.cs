@@ -84,7 +84,15 @@ namespace MyERP.Api.Services
                 throw new InvalidOperationException("Format file harus JPG atau PNG.");
             }
 
-            var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "avatars");
+            var webRootPath = _environment.WebRootPath 
+                ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
+
+            if (!Directory.Exists(webRootPath))
+            {
+                Directory.CreateDirectory(webRootPath);
+            }
+
+            var uploadsFolder = Path.Combine(webRootPath, "uploads", "avatars");
             if (!Directory.Exists(uploadsFolder))
             {
                 Directory.CreateDirectory(uploadsFolder);
@@ -92,7 +100,7 @@ namespace MyERP.Api.Services
 
             if (!string.IsNullOrEmpty(user.AvatarUrl))
             {
-                var oldPath = Path.Combine(_environment.WebRootPath, user.AvatarUrl.TrimStart('/'));
+                var oldPath = Path.Combine(webRootPath, user.AvatarUrl.TrimStart('/'));
                 if (File.Exists(oldPath))
                 {
                     File.Delete(oldPath);
@@ -121,7 +129,10 @@ namespace MyERP.Api.Services
 
             if (!string.IsNullOrEmpty(user.AvatarUrl))
             {
-                var oldPath = Path.Combine(_environment.WebRootPath, user.AvatarUrl.TrimStart('/'));
+                var webRootPath = _environment.WebRootPath 
+                    ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
+                
+                var oldPath = Path.Combine(webRootPath, user.AvatarUrl.TrimStart('/'));
                 if (File.Exists(oldPath))
                 {
                     File.Delete(oldPath);
