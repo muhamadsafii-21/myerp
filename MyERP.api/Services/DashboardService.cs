@@ -17,8 +17,8 @@ namespace MyERP.Api.Services
         public async Task<DashboardDto> GetDashboardDataAsync()
         {
             var now = DateTime.UtcNow;
-            var startOfMonth = new DateTime(now.Year, now.Month, 1);
-            var sevenDaysAgo = now.Date.AddDays(-6);
+            var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var sevenDaysAgo = DateTime.SpecifyKind(now.Date.AddDays(-6), DateTimeKind.Utc);
 
             var stats = await GetStatsAsync(startOfMonth);
             var salesChart = await GetSalesChartAsync(sevenDaysAgo);
@@ -36,6 +36,8 @@ namespace MyERP.Api.Services
 
         private async Task<DashboardStatsDto> GetStatsAsync(DateTime startOfMonth)
         {
+            startOfMonth = DateTime.SpecifyKind(startOfMonth, DateTimeKind.Utc);
+
             var totalProducts = await _context.Products
                 .CountAsync(p => p.IsActive);
 
@@ -61,6 +63,8 @@ namespace MyERP.Api.Services
 
         private async Task<List<SalesChartDto>> GetSalesChartAsync(DateTime startDate)
         {
+            startDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+
             var purchases = await _context.PurchaseOrders
                 .Where(po => po.IsActive && po.Status == "Received" && po.OrderDate >= startDate)
                 .GroupBy(po => po.OrderDate.Date)
@@ -77,8 +81,8 @@ namespace MyERP.Api.Services
             for (int i = 0; i < 7; i++)
             {
                 var date = startDate.AddDays(i);
-                var purchaseTotal = purchases.FirstOrDefault(p => p.Date == date)?.Total ?? 0;
-                var salesTotal = sales.FirstOrDefault(s => s.Date == date)?.Total ?? 0;
+                var purchaseTotal = purchases.FirstOrDefault(p => p.Date == date.Date)?.Total ?? 0;
+                var salesTotal = sales.FirstOrDefault(s => s.Date == date.Date)?.Total ?? 0;
 
                 result.Add(new SalesChartDto
                 {

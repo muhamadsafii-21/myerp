@@ -8,6 +8,7 @@ using MyERP.Api.Services;
 using MyERP.Api.Services.Interfaces;
 
 AppContext.SetSwitch("Switch.Microsoft.Data.SqlClient.UseSystemDefaultSecureProtocols", true);
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
