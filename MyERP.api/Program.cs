@@ -77,6 +77,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.MapGet("/migrate-now", async (AppDbContext db) =>
+{
+    try
+    {
+        await db.Database.MigrateAsync();
+        return Results.Ok(new { message = "Migration berhasil!" });
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+});
 
 if (app.Environment.IsDevelopment())
 {
