@@ -9,12 +9,10 @@ namespace MyERP.Api.Services
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
-        private readonly IWebHostEnvironment _environment;
 
-        public UserService(AppDbContext context, IWebHostEnvironment environment)
+        public UserService(AppDbContext context)
         {
             _context = context;
-            _environment = environment;
         }
 
         public async Task<UserProfileDto?> GetProfileAsync(int userId)
@@ -84,38 +82,16 @@ namespace MyERP.Api.Services
                 throw new InvalidOperationException("Format file harus JPG atau PNG.");
             }
 
-            var webRootPath = _environment.WebRootPath 
-                ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
+            using var memoryStream = new MemoryStream();
+            await file.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
 
-            if (!Directory.Exists(webRootPath))
-            {
-                Directory.CreateDirectory(webRootPath);
-            }
+            var base64 = Convert.ToBase64String(bytes);
+            var mimeType = extension == ".png" ? "image/png" : "image/jpeg";
+            var dataUri = $"data:{mimeType};base64,{base64}";
 
-            var uploadsFolder = Path.Combine(webRootPath, "uploads", "avatars");
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            if (!string.IsNullOrEmpty(user.AvatarUrl))
-            {
-                var oldPath = Path.Combine(webRootPath, user.AvatarUrl.TrimStart('/'));
-                if (File.Exists(oldPath))
-                {
-                    File.Delete(oldPath);
-                }
-            }
-
-            var fileName = $"user-{userId}-{DateTime.UtcNow.Ticks}{extension}";
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            user.AvatarUrl = $"/uploads/avatars/{fileName}";
+            user.AvatarData = dataUri;
+            user.AvatarUrl = null;
             user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -127,18 +103,7 @@ namespace MyERP.Api.Services
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return false;
 
-            if (!string.IsNullOrEmpty(user.AvatarUrl))
-            {
-                var webRootPath = _environment.WebRootPath 
-                    ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
-                
-                var oldPath = Path.Combine(webRootPath, user.AvatarUrl.TrimStart('/'));
-                if (File.Exists(oldPath))
-                {
-                    File.Delete(oldPath);
-                }
-            }
-
+            user.AvatarData = null;
             user.AvatarUrl = null;
             user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
@@ -156,6 +121,7 @@ namespace MyERP.Api.Services
                 FullName = user.FullName,
                 Role = user.Role,
                 AvatarUrl = user.AvatarUrl,
+                AvatarData = user.AvatarData,
                 LastLoginAt = user.LastLoginAt
             };
         }

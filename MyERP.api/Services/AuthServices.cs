@@ -34,16 +34,17 @@ namespace MyERP.Api.Services
             }
 
             var token = _jwtHelper.GenerateToken(user);
-            return new AuthResponseDto
-            {
-                Token = token,
-                Username = user.Username,
-                FullName = user.FullName,
-                Email = user.Email,           // ← Harus ada
-                Role = user.Role ?? "Staff",
-                AvatarUrl = user.AvatarUrl,   // ← Harus ada
-                ExpiresAt = DateTime.UtcNow.AddMinutes(60)
-            };
+           return new AuthResponseDto
+{
+    Token = token,
+    Username = user.Username,
+    FullName = user.FullName,
+    Email = user.Email,
+    Role = user.Role ?? "Staff",
+    AvatarUrl = user.AvatarUrl,
+    AvatarData = user.AvatarData,
+    ExpiresAt = DateTime.UtcNow.AddMinutes(60)
+};
         }
     }
 }

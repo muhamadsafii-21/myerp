@@ -10,6 +10,7 @@ namespace MyERP.Api.DTOs.User
         public string FullName { get; set; } = string.Empty;
         public string? Role { get; set; }
         public string? AvatarUrl { get; set; }
+        public string? AvatarData { get; set; }
         public DateTime? LastLoginAt { get; set; }
     }
 

@@ -25,6 +25,7 @@ namespace MyERP.Api.Models.Auth
 
         [MaxLength(500)]
         public string? AvatarUrl { get; set; }
+         public string? AvatarData { get; set; }
 
         public DateTime? LastLoginAt { get; set; }
     }
