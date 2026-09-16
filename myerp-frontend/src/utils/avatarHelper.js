@@ -27,10 +27,20 @@ export const getAvatarColor = (name) => {
     return colors[index];
 };
 
-export const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) return null;
-    if (avatarUrl.startsWith('http')) return avatarUrl;
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5051/api';
-    const serverUrl = baseUrl.replace('/api', '');
-    return `${serverUrl}${avatarUrl}`;
+export const getAvatarSrc = (user) => {
+    if (!user) return null;
+
+    if (user.avatarData) {
+        return user.avatarData;
+    }
+
+    if (user.avatarUrl) {
+        if (user.avatarUrl.startsWith('http')) return user.avatarUrl;
+        if (user.avatarUrl.startsWith('data:')) return user.avatarUrl;
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5051/api';
+        const serverUrl = baseUrl.replace('/api', '');
+        return `${serverUrl}${user.avatarUrl}`;
+    }
+
+    return null;
 };

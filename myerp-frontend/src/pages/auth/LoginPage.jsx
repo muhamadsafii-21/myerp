@@ -19,16 +19,17 @@ export default function LoginPage() {
         try {
             const data = await login(username, password);
             loginUser(
-                {
-                    id: data.id,
-                    username: data.username,
-                    fullName: data.fullName,
-                    email: data.email,
-                    role: data.role,
-                    avatarUrl: data.avatarUrl
-                },
-                data.token
-            );
+    {
+        id: data.id,
+        username: data.username,
+        fullName: data.fullName,
+        email: data.email,
+        role: data.role,
+        avatarUrl: data.avatarUrl,
+        avatarData: data.avatarData
+    },
+    data.token
+);
             toast.success(`Selamat datang, ${data.fullName}!`);
             navigate('/dashboard');
         } catch (error) {

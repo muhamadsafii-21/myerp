@@ -49,16 +49,17 @@ export default function ProfilePage() {
             const updated = await updateProfile(profileForm);
             setProfile(updated);
 
-            const token = localStorage.getItem('token');
-            loginUser(
-                {
-                    ...user,
-                    fullName: updated.fullName,
-                    email: updated.email,
-                    avatarUrl: updated.avatarUrl
-                },
-                token
-            );
+          const token = localStorage.getItem('token');
+loginUser(
+    {
+        ...user,
+        fullName: updated.fullName,
+        email: updated.email,
+        avatarUrl: updated.avatarUrl,
+        avatarData: updated.avatarData
+    },
+    token
+);
 
             toast.success('Profil berhasil diperbarui!');
         } catch (err) {
@@ -104,17 +105,17 @@ export default function ProfilePage() {
     };
 
     const handleAvatarUpdate = (updatedProfile) => {
-        setProfile(updatedProfile);
-        const token = localStorage.getItem('token');
-        loginUser(
-            {
-                ...user,
-                avatarUrl: updatedProfile.avatarUrl
-            },
-            token
-        );
-    };
-
+    setProfile(updatedProfile);
+    const token = localStorage.getItem('token');
+    loginUser(
+        {
+            ...user,
+            avatarUrl: updatedProfile.avatarUrl,
+            avatarData: updatedProfile.avatarData
+        },
+        token
+    );
+};
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">

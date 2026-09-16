@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/authContext';
-import { getInitials, getAvatarColor, getAvatarUrl } from '../../utils/avatarHelper';
+import { getInitials, getAvatarColor, getAvatarSrc } from '../../utils/avatarHelper';
 
 export default function UserMenu() {
     const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +29,7 @@ export default function UserMenu() {
     const roleName = typeof user?.role === 'string'
         ? user.role
         : user?.role?.name || '-';
-    const avatarUrl = getAvatarUrl(user?.avatarUrl);
+    const avatarUrl = getAvatarSrc(user);
 
     return (
         <div className="relative" ref={dropdownRef}>

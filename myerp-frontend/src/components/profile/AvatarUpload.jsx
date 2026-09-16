@@ -2,14 +2,14 @@ import { useState, useRef } from 'react';
 import { Camera, Trash2, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadAvatar, deleteAvatar } from '../../api/users';
-import { getInitials, getAvatarColor, getAvatarUrl } from '../../utils/avatarHelper';
+import { getInitials, getAvatarColor, getAvatarSrc } from '../../utils/avatarHelper';
 
 export default function AvatarUpload({ user, onUpdate }) {
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef(null);
 
     const fullName = user?.fullName || user?.username || 'User';
-    const avatarUrl = getAvatarUrl(user?.avatarUrl);
+   const avatarUrl = getAvatarSrc(user);
 
     const handleFileChange = async (e) => {
         const file = e.target.files?.[0];
